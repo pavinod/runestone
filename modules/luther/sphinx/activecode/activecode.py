@@ -169,6 +169,8 @@ VIZ = '''<div id="%(divid)s_codelens_div" style="display:none"></div>'''
 
 COACH = '''<div id="%(divid)s_coach_div" style="display:none;"></div>'''
 
+CGI= '''<div id="%(divid)s_cgiout" style="display:block; background-color: #FFF; border: solid 1px black;"></div>'''
+
 END = '''
 </div>
 
@@ -240,6 +242,9 @@ def visit_ac_node(self,node):
     if 'coach' in node.ac_components:
         res += COACH
 
+    if node.ac_components['language'] == 'cgi':
+        res += CGI
+        
     res += SCRIPT
     res += END
     res = res % node.ac_components

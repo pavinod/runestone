@@ -63,6 +63,28 @@ function outf(text) {
     mypre.innerHTML = mypre.innerHTML + text;
 }
 
+function cgiout(text) {
+    var mydiv = document.getElementById(Sk.cgiDiv);
+    // bnm python 3
+    x = text;
+    if (x.charAt(0) == '(') {
+        x = x.slice(1, -1);
+        x = '[' + x + ']';
+        try {
+            var xl = eval(x);
+            xl = xl.map(pyStr);
+            x = xl.join(' ');
+        } catch (err) {
+        }
+    }
+    text = x;
+    text = text.replace(/content-type:.*/i,'')
+    text = text.replaceAll('\n','')
+    mydiv.innerHTML = mydiv.innerHTML + text;
+}
+
+
+
 var keymap = {
     "Ctrl-Enter" : function (editor) {
         runit(editor.parentDiv);
@@ -274,8 +296,12 @@ function runit(myDiv, theButton, includes, suffix) {
 
     var mypre = document.getElementById(myDiv + "_pre");
     if (mypre) mypre.innerHTML = '';
+    var mycgiDiv = document.getElementById(myDiv + "_cgiout");
+    if (mycgiDiv) mycgiDiv.innerHTML = '';
+    
     Sk.canvas = myDiv + "_canvas";
     Sk.pre = myDiv + "_pre";
+    Sk.cgiDiv = myDiv+"_cgiout";
     var can = document.getElementById(Sk.canvas);
     // The following lines reset the canvas so that each time the run button
     // is pressed the turtle(s) get a clean canvas.
@@ -298,6 +324,9 @@ function runit(myDiv, theButton, includes, suffix) {
     try {
         if(lang === 'python') {
             Sk.importMainWithBody("<stdin>", false, prog);
+        } else if (lang === 'cgi') {
+            Sk.configure({output: function(text) { cgiout(text); outf(text);} } );
+            Sk.importMainWithBody("<stdin>", false, prog);            
         } else if (lang === 'javascript') {
             eval(prog);
         } else {
